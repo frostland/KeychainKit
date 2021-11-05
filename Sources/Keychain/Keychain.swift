@@ -5,7 +5,7 @@ import Security
 
 public enum Keychain {
 	
-	static func getStoredData(withIdentifier identifier: String, accessGroup: String? = nil, username: String = "") throws -> Data? {
+	public static func getStoredData(withIdentifier identifier: String, accessGroup: String? = nil, username: String = "") throws -> Data? {
 		var searchResult: CFTypeRef?
 		var query = baseQuery(forIdentifier: identifier, accessGroup: accessGroup, username: username)
 		query[kSecMatchLimit          as String] = kSecMatchLimitOne
@@ -31,7 +31,7 @@ public enum Keychain {
 	}
 	
 	/** Setting data to nil just removes the entry in the keychain. */
-	static func setStoredData(_ data: Data?, withIdentifier identifier: String, accessGroup: String? = nil, username: String = "") throws {
+	public static func setStoredData(_ data: Data?, withIdentifier identifier: String, accessGroup: String? = nil, username: String = "") throws {
 		guard let data = data else {
 			try removeStoredData(withIdentifier: identifier, accessGroup: accessGroup, username: username)
 			return
@@ -69,7 +69,7 @@ public enum Keychain {
 		assert((try? getStoredData(withIdentifier: identifier, accessGroup: accessGroup, username: username)) == data)
 	}
 	
-	static func removeStoredData(withIdentifier identifier: String, accessGroup: String? = nil, username: String = "") throws {
+	public static func removeStoredData(withIdentifier identifier: String, accessGroup: String? = nil, username: String = "") throws {
 		let query = baseQuery(forIdentifier: identifier, accessGroup: accessGroup, username: username)
 		
 		let error = SecItemDelete(query as CFDictionary)
@@ -84,7 +84,7 @@ public enum Keychain {
 	
 #if !os(macOS)
 	/* Clearing the keychain only makes sense on a fully sandboxed environment (iOS, watchOS, etc.) */
-	static func clearKeychain() throws {
+	public static func clearKeychain() throws {
 		let query = [kSecClass as String: kSecClassGenericPassword]
 		
 		let error = SecItemDelete(query as CFDictionary)
