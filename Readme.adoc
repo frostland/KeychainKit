@@ -1,0 +1,21 @@
+= Keychain
+François Lamboley <fload@me.com>
+
+Yet another Keychain wrapper.
+
+== Usage
+[source,swift]
+----
+let data = Data("Hello world!".utf8)
+let keychainId = "fr.frostland.Keychain.test"
+
+/* Set some data in the keychain */
+try Keychain.setStoredData(data, withIdentifier: keychainId)
+
+/* Retrieve the data from the keychain */
+let storedData = try Keychain.getStoredData(withIdentifier: keychainId)
+assert(data == storedData) /* This should be true */
+
+/* Delete some data from the keychain */
+try Keychain.removeStoredData(withIdentifier: keychainId)
+----
