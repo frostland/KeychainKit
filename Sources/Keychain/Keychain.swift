@@ -38,17 +38,11 @@ public enum Keychain {
 		}
 		
 		var query = baseQuery(forIdentifier: identifier, accessGroup: accessGroup, username: username)
-		query[kSecAttrAccessible      as String] = kSecAttrAccessibleAfterFirstUnlock
-		query[kSecClass               as String] = kSecClassGenericPassword
-		query[kSecMatchLimit          as String] = kSecMatchLimitOne
-		query[kSecReturnData          as String] = kCFBooleanFalse
-		query[kSecReturnRef           as String] = kCFBooleanFalse
-		query[kSecReturnPersistentRef as String] = kCFBooleanFalse
-		query[kSecReturnAttributes    as String] = kCFBooleanTrue
-		query[kSecAttrIsInvisible     as String] = kCFBooleanFalse
-		query[kSecValueData           as String] = data
-		
-		let updatedProperties = [kSecValueData as String: data]
+		let updatedProperties: [String: Any] = [
+			kSecValueData       as String: data,
+			kSecAttrIsInvisible as String: kCFBooleanFalse as Any,
+			kSecAttrAccessible  as String: kSecAttrAccessibleAfterFirstUnlock
+		]
 		
 		/* First we try and update the existing property.
 		 * If the property does not exist, we will process the error and use SecItemAdd. */
@@ -56,10 +50,10 @@ public enum Keychain {
 		if saveError == errSecItemNotFound {
 			/* We don't have a previous entry for the given username, keychain identifier and access group.
 			 * Let’s use SecItemAdd. */
-			var saveQuery = query
-			saveQuery[kSecValueData as String] = data
-			
-			saveError = SecItemAdd(saveQuery as CFDictionary, nil)
+			query[kSecValueData       as String] = data
+			query[kSecAttrIsInvisible as String] = kCFBooleanFalse
+			query[kSecAttrAccessible  as String] = kSecAttrAccessibleAfterFirstUnlock
+			saveError = SecItemAdd(query as CFDictionary, nil)
 		}
 		if saveError != errSecSuccess {
 			throw secErrorFrom(statusCode: saveError)
