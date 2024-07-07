@@ -13,7 +13,9 @@ import SwiftUI
 struct ContentView: View {
 	
 	var body: some View {
-		VStack { }
+		VStack { 
+			Text("Hello world")
+		}
 	}
 	
 }

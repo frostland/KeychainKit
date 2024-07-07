@@ -6,5 +6,10 @@
 	<true/>
 	<key>com.apple.security.files.user-selected.read-only</key>
 	<true/>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)fr.frostland.KeychainTestsHost</string>
+		<string>$(AppIdentifierPrefix)fr.frostland.KeychainTestsHost.shared</string>
+	</array>
 </dict>
 </plist>

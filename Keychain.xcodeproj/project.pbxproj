@@ -12,6 +12,7 @@
 		7B235F372C3B4CAE00C13B8B /* SecUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B235F342C3B4CAE00C13B8B /* SecUtils.swift */; };
 		7B235F382C3B4CAE00C13B8B /* KeychainErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B235F352C3B4CAE00C13B8B /* KeychainErrors.swift */; };
 		7B235F392C3B4CAE00C13B8B /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B235F362C3B4CAE00C13B8B /* Keychain.swift */; };
+		7BB003982C3B58FC00DB1082 /* Keychain.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B235F1C2C3B4B6000C13B8B /* Keychain.framework */; };
 		7BFA99A62C3B4EE0003AA8EE /* KeychainTestsHostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA99A52C3B4EE0003AA8EE /* KeychainTestsHostApp.swift */; };
 		7BFA99A82C3B4EE0003AA8EE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA99A72C3B4EE0003AA8EE /* ContentView.swift */; };
 		7BFA99AA2C3B4EE1003AA8EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7BFA99A92C3B4EE1003AA8EE /* Assets.xcassets */; };
@@ -70,6 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7BB003982C3B58FC00DB1082 /* Keychain.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +85,7 @@
 				7B235F282C3B4B6000C13B8B /* KeychainTests */,
 				7BFA99A42C3B4EE0003AA8EE /* KeychainTestsHost */,
 				7B235F1D2C3B4B6000C13B8B /* Products */,
+				7BB003972C3B58FC00DB1082 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -114,6 +117,13 @@
 			);
 			name = KeychainTests;
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		7BB003972C3B58FC00DB1082 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		7BFA99A42C3B4EE0003AA8EE /* KeychainTestsHost */ = {
@@ -265,8 +275,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7BFA99AE2C3B4EE1003AA8EE /* Preview Assets.xcassets in Resources */,
 				7BFA99AA2C3B4EE1003AA8EE /* Assets.xcassets in Resources */,
+				7BFA99AE2C3B4EE1003AA8EE /* Preview Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
