@@ -6,7 +6,7 @@ let package = Package(
 	name: "Keychain",
 	products: [.library(name: "Keychain", targets: ["Keychain"])],
 	targets: [
-		.target(name: "Keychain", dependencies: []),
-		.testTarget(name: "KeychainTests", dependencies: ["Keychain"])
+		.target(name: "Keychain", path: "Sources"),
+		.testTarget(name: "KeychainTests", dependencies: ["Keychain"], path: "Tests")
 	]
 )
