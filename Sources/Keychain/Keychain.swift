@@ -6,7 +6,7 @@ import Security
 public enum Keychain {
 	
 	public static func getStoredData(withIdentifier identifier: String, accessGroup: String? = nil, username: String = "") throws -> Data? {
-		var query = baseQuery(forIdentifier: identifier, accessGroup: accessGroup, username: username)
+		var query = try baseQuery(forIdentifier: identifier, accessGroup: accessGroup, username: username)
 		query[kSecMatchLimit]          = kSecMatchLimitOne
 		query[kSecReturnData]          = kCFBooleanTrue
 		query[kSecReturnRef]           = kCFBooleanFalse
@@ -37,7 +37,7 @@ public enum Keychain {
 			return
 		}
 		
-		var query = baseQuery(forIdentifier: identifier, accessGroup: accessGroup, username: username)
+		var query = try baseQuery(forIdentifier: identifier, accessGroup: accessGroup, username: username)
 		let updatedProperties: [CFString: Any] = [
 			kSecValueData:       data,
 			kSecAttrIsInvisible: kCFBooleanFalse as Any,
@@ -65,7 +65,7 @@ public enum Keychain {
 	}
 	
 	public static func removeStoredData(withIdentifier identifier: String, accessGroup: String? = nil, username: String = "") throws {
-		let query = baseQuery(forIdentifier: identifier, accessGroup: accessGroup, username: username)
+		let query = try baseQuery(forIdentifier: identifier, accessGroup: accessGroup, username: username)
 		
 		let error = SecItemDelete(query as CFDictionary)
 		switch error {
@@ -77,10 +77,19 @@ public enum Keychain {
 		}
 	}
 	
-#if !os(macOS)
-	/* Clearing the keychain only makes sense on a fully sandboxed environment (iOS, watchOS, etc.) */
-	public static func clearKeychain() throws {
-		let query = [kSecClass: kSecClassGenericPassword]
+	public static func clearKeychain(accessGroup: String? = nil) throws {
+		var query: [CFString: Any] = [kSecClass: kSecClassGenericPassword]
+		if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
+			/* See baseQuery(…) for info about this. */
+			query[kSecUseDataProtectionKeychain] = kCFBooleanTrue
+		} else {
+#if os(macOS)
+			throw Err.clearingKeychainOnNonSandboxedEnvironment
+#endif
+		}
+		if let accessGroup {
+			query[kSecAttrAccessGroup] = accessGroup
+		}
 		
 		let error = SecItemDelete(query as CFDictionary)
 		switch error {
@@ -91,25 +100,30 @@ public enum Keychain {
 				throw secErrorFrom(statusCode: error)
 		}
 	}
-#endif
 	
 	/* ***************
 	   MARK: - Private
 	   *************** */
 	
-	private static func baseQuery(forIdentifier identifier: String, accessGroup: String?, username: String) -> [CFString: Any] {
+	private static func baseQuery(forIdentifier identifier: String, accessGroup: String?, username: String) throws -> [CFString: Any] {
 		var res = [CFString: Any]()
 		res[kSecClass] = kSecClassGenericPassword
 //		res[kSecAttrGeneric] = identifier
 		res[kSecAttrService] = identifier
 		res[kSecAttrAccount] = username
-#if !os(iOS) || !targetEnvironment(simulator)
-		/* We ignore the access group if target is the iPhone simulator.
-		 * See the GenericKeychain Apple example in the docs for an explanation on why we do this. */
+		if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
+			/* Make the keychain behave like iOS/watchOS/etc. on macOS.
+			 * The previous behaviour is deprecated; we do not support it at all. */
+			res[kSecUseDataProtectionKeychain] = kCFBooleanTrue
+		}
 		if let accessGroup = accessGroup {
+#if os(macOS)
+			guard #available(macOS 10.15, *) else {
+				throw Err.accessGroupNotSupported
+			}
+#endif
 			res[kSecAttrAccessGroup] = accessGroup
 		}
-#endif
 		
 		return res
 	}
