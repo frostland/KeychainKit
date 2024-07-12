@@ -15,6 +15,13 @@ public enum KeychainError : Error {
 	case invalidResponseFromSecurityFramework
 	case internalError
 	
+	public var isProtectedDataUnavailableError: Bool {
+		if case .secError(errSecInteractionNotAllowed, _) = self {
+			return true
+		}
+		return false
+	}
+	
 }
 
 typealias Err = KeychainError
