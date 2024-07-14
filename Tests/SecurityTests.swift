@@ -61,6 +61,30 @@ final class SecurityTests : XCTestCase {
 		})
 	}
 	
+	func testEntryNoAccount() throws {
+		var query: [CFString : Any] = [
+			kSecClass: kSecClassGenericPassword,
+			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
+			kSecAttrService: "SecTest",
+			kSecValueData: Data([42])
+		]
+		XCTAssertNoThrow(try secCall{
+			return SecItemAdd(query as CFDictionary, nil)
+		})
+		
+		query[kSecAttrAccount] = "Yolo"
+		XCTAssertNoThrow(try secCall{
+			return SecItemAdd(query as CFDictionary, nil)
+		})
+		
+		query[kSecAttrAccount] = ""
+		XCTAssertThrowsError(try secCall{
+			return SecItemAdd(query as CFDictionary, nil)
+		}, "expected an error because the item already exist as not setting the account is the same as setting it to nil", { (err: Error) in
+			XCTAssertEqual(err as? KeychainError, KeychainError(statusCode: errSecDuplicateItem))
+		})
+	}
+	
 }
 
 
