@@ -14,7 +14,7 @@ final class SecurityTests : XCTestCase {
 	}
 	
 	func testUpdateServiceAccountGeneric() throws {
-		let baseQuery: [CFString : Any] = [
+		let baseQuery: [CFString: Any] = [
 			kSecClass: kSecClassGenericPassword,
 			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
 			
@@ -62,7 +62,7 @@ final class SecurityTests : XCTestCase {
 	}
 	
 	func testEntryNoAccount() throws {
-		var query: [CFString : Any] = [
+		var query: [CFString: Any] = [
 			kSecClass: kSecClassGenericPassword,
 			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
 			kSecAttrService: "SecTest",
@@ -90,7 +90,7 @@ final class SecurityTests : XCTestCase {
 	 * The observed behaviour is the request succeeds(!) but returns a NULL ref. */
 	@available(macOS, deprecated: 10.10)
 	func testFetchItemRef() throws {
-		let baseQuery: [CFString : Any] = [
+		let baseQuery: [CFString: Any] = [
 			kSecClass: kSecClassGenericPassword,
 			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
 			kSecAttrService: "SecTest"
@@ -111,7 +111,7 @@ final class SecurityTests : XCTestCase {
 #endif
 	
 	func testFetchItemPersistentRef() throws {
-		let baseQuery: [CFString : Any] = [
+		let baseQuery: [CFString: Any] = [
 			kSecClass: kSecClassGenericPassword,
 			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
 			kSecAttrService: "SecTest"
@@ -131,7 +131,7 @@ final class SecurityTests : XCTestCase {
 	}
 	
 	func testFetchItemAttributes() throws {
-		let baseQuery: [CFString : Any] = [
+		let baseQuery: [CFString: Any] = [
 			kSecClass: kSecClassGenericPassword,
 			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
 			kSecAttrService: "SecTest"
@@ -151,7 +151,7 @@ final class SecurityTests : XCTestCase {
 	}
 	
 	func testFetchItemData() throws {
-		let baseQuery: [CFString : Any] = [
+		let baseQuery: [CFString: Any] = [
 			kSecClass: kSecClassGenericPassword,
 			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
 			kSecAttrService: "SecTest"
@@ -171,7 +171,7 @@ final class SecurityTests : XCTestCase {
 	}
 	
 	func testFetchItemDataAndAttributesAndPersistentRef() throws {
-		let baseQuery: [CFString : Any] = [
+		let baseQuery: [CFString: Any] = [
 			kSecClass: kSecClassGenericPassword,
 			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
 			kSecAttrService: "SecTest"
@@ -195,7 +195,7 @@ final class SecurityTests : XCTestCase {
 	}
 	
 	func testFetchItemDataAndPersistentRef() throws {
-		let baseQuery: [CFString : Any] = [
+		let baseQuery: [CFString: Any] = [
 			kSecClass: kSecClassGenericPassword,
 			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
 			kSecAttrService: "SecTest"
