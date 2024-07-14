@@ -1,10 +1,47 @@
 import Foundation
+import os.log
 import Security
 
 
 
 public enum Keychain {
 	
+	public static func performSearch(_ query: [CFString: Any]) throws -> [CFString: Any]? {
+		var searchResult: CFTypeRef?
+		let error = SecItemCopyMatching(query as CFDictionary, &searchResult)
+		switch error {
+			case errSecSuccess:
+				if let dictionary = searchResult as? [CFString: Any] {
+					return dictionary
+					
+				} else if let searchResult {
+					let returnRef           = (query[kSecReturnRef]           as? Bool) ?? false
+					let returnData          = (query[kSecReturnData]          as? Bool) ?? false
+					let returnAttributes    = (query[kSecReturnAttributes]    as? Bool) ?? false
+					let returnPersistentRef = (query[kSecReturnPersistentRef] as? Bool) ?? false
+					switch (returnRef, returnData, returnPersistentRef) {
+						case (true, false, false): return [kSecValueRef:           searchResult]
+						case (false, true, false): return [kSecValueData:          searchResult]
+						case (false, false, true): return [kSecValuePersistentRef: searchResult]
+						default:
+							os_log("Unexpected configuration for non-dictionary result: <returnRef=%d, returnData=%d, returnAttributes=%d, returnPersistentRef=%d>.", log: logger, type: .error, returnRef, returnData, returnAttributes, returnPersistentRef)
+							throw Err.internalError
+					}
+					
+				} else {
+					/* In theory if SecItemCopyMatching does not return an error, the search result should not be nil. */
+					throw Err.invalidResponseFromSecurityFramework
+				}
+				
+			case errSecItemNotFound:
+				return nil
+				
+			default:
+				throw Err(statusCode: error)
+		}
+	}
+	
+	@available(*, deprecated)
 	public static func getStoredData(withIdentifier identifier: String, accessGroup: String? = nil, username: String = "") throws -> Data? {
 		var query = try baseQuery(forIdentifier: identifier, accessGroup: accessGroup, username: username)
 		query[kSecMatchLimit]          = kSecMatchLimitOne
@@ -31,6 +68,7 @@ public enum Keychain {
 	}
 	
 	/** Setting data to nil just removes the entry in the keychain. */
+	@available(*, deprecated)
 	public static func setStoredData(_ data: Data?, withIdentifier identifier: String, accessGroup: String? = nil, username: String = "") throws {
 		guard let data = data else {
 			try removeStoredData(withIdentifier: identifier, accessGroup: accessGroup, username: username)
@@ -64,6 +102,7 @@ public enum Keychain {
 		assert((try? getStoredData(withIdentifier: identifier, accessGroup: accessGroup, username: username)) == data)
 	}
 	
+	@available(*, deprecated)
 	public static func removeStoredData(withIdentifier identifier: String, accessGroup: String? = nil, username: String = "") throws {
 		let query = try baseQuery(forIdentifier: identifier, accessGroup: accessGroup, username: username)
 		
@@ -77,6 +116,7 @@ public enum Keychain {
 		}
 	}
 	
+	@available(*, deprecated)
 	public static func clearKeychain(accessGroup: String? = nil) throws {
 		var query: [CFString: Any] = [kSecClass: kSecClassGenericPassword]
 		if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
@@ -105,6 +145,7 @@ public enum Keychain {
 	   MARK: - Private
 	   *************** */
 	
+	@available(*, deprecated)
 	private static func baseQuery(forIdentifier identifier: String, accessGroup: String?, username: String) throws -> [CFString: Any] {
 		var res = [CFString: Any]()
 		res[kSecClass] = kSecClassGenericPassword

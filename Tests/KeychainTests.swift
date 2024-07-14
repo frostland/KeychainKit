@@ -1,4 +1,5 @@
 import Foundation
+import Security
 import XCTest
 
 @testable import KeychainKit
@@ -6,6 +7,31 @@ import XCTest
 
 
 final class KeychainTests : XCTestCase {
+	
+	override func setUp() async throws {
+		try Keychain.clearKeychain()
+	}
+	
+	func testPerformSearch() throws {
+		let baseQuery: [CFString: Any] = [
+			kSecClass: kSecClassGenericPassword,
+			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
+			kSecAttrService: "SecTest"
+		]
+		XCTAssertNoThrow(try secCall{
+			var query = baseQuery
+			query[kSecValueData] = Data([42])
+			return SecItemAdd(query as CFDictionary, nil)
+		})
+		
+		let ret = try XCTUnwrap(Keychain.performSearch({
+			var query = baseQuery
+			query[kSecReturnPersistentRef] = kCFBooleanTrue
+			return query
+		}()))
+		XCTAssertEqual(ret.count, 1)
+		XCTAssertNotNil(ret[kSecValuePersistentRef])
+	}
 	
 	func testBasicStorage() throws {
 		let data = Data("hello!".utf8)
