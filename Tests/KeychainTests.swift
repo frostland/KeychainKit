@@ -1,9 +1,11 @@
+import Foundation
 import XCTest
+
 @testable import KeychainKit
 
 
 
-final class KeychainTests: XCTestCase {
+final class KeychainTests : XCTestCase {
 	
 	func testBasicStorage() throws {
 		let data = Data("hello!".utf8)

@@ -15,6 +15,14 @@ public enum KeychainError : Error {
 	case invalidResponseFromSecurityFramework
 	case internalError
 	
+	internal init(statusCode: OSStatus) {
+#if os(macOS)
+		self = .secError(code: statusCode, message: SecCopyErrorMessageString(statusCode, nil/* reserved for future use */) as String?)
+#else
+		self = .secError(code: statusCode, message: nil)
+#endif
+	}
+	
 	public var isProtectedDataUnavailableError: Bool {
 		if case .secError(errSecInteractionNotAllowed, _) = self {
 			return true

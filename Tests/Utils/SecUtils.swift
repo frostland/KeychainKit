@@ -4,6 +4,9 @@
 import Foundation
 import Security
 
+/* testable import to get the “status code” init of KeychainError. */
+@testable import KeychainKit
+
 
 
 /**
@@ -24,8 +27,8 @@ import Security
 func secCall(_ body: () -> OSStatus) throws {
 	let err = body()
 	guard err == errSecSuccess else {
-//		throw secErrorFrom(statusCode: err)
-		throw NSError(domain: NSOSStatusErrorDomain, code: Int(err), userInfo: nil)
+//		throw NSError(domain: NSOSStatusErrorDomain, code: Int(err), userInfo: nil)
+		throw KeychainError(statusCode: err)
 	}
 }
 
@@ -54,11 +57,11 @@ func secCall<Result>(_ body: (_ resultPtr: UnsafeMutablePointer<Result?>) -> OSS
 	var result: Result? = nil
 	let err = body(&result)
 	guard err == errSecSuccess else {
-//		throw secErrorFrom(statusCode: err)
-		throw NSError(domain: NSOSStatusErrorDomain, code: Int(err), userInfo: nil)
+//		throw NSError(domain: NSOSStatusErrorDomain, code: Int(err), userInfo: nil)
+		throw KeychainError(statusCode: err)
 	}
 	guard let result else {
-		throw Err.invalidResponseFromSecurityFramework
+		throw KeychainError.invalidResponseFromSecurityFramework
 	}
 	return result
 }
@@ -82,10 +85,10 @@ func secCall<Result>(_ body: (_ resultPtr: UnsafeMutablePointer<Result?>) -> OSS
    - body: A function that returns a value, or `nil` if there’s an error.
  - Throws: If `body` returns `nil`.
  - Returns: On success, the non-`nil` value returned by `body`. */
-func secCall<Result>(_ code: Int = Int(errSecParam), _ body: () -> Result?) throws -> Result {
+func secCall<Result>(_ code: Int32 = errSecParam, _ body: () -> Result?) throws -> Result {
 	guard let result = body() else {
-//		throw secErrorFrom(statusCode: err)
-		throw NSError(domain: NSOSStatusErrorDomain, code: code, userInfo: nil)
+//		throw NSError(domain: NSOSStatusErrorDomain, code: code, userInfo: nil)
+		throw KeychainError(statusCode: code)
 	}
 	return result
 }
@@ -111,7 +114,7 @@ func secCall<Result>(_ body: (_ resultPtr: UnsafeMutablePointer<Unmanaged<CFErro
 	var errorQ: Unmanaged<CFError>? = nil
 	guard let result = body(&errorQ) else {
 		guard let errorQ else {
-			throw Err.invalidResponseFromSecurityFramework
+			throw KeychainError.invalidResponseFromSecurityFramework
 		}
 		throw errorQ.takeRetainedValue() as Error
 	}
@@ -138,18 +141,8 @@ func secCall(_ body: (_ resultPtr: UnsafeMutablePointer<Unmanaged<CFError>?>) ->
 	var errorQ: Unmanaged<CFError>? = nil
 	guard body(&errorQ) else {
 		guard let errorQ else {
-			throw Err.invalidResponseFromSecurityFramework
+			throw KeychainError.invalidResponseFromSecurityFramework
 		}
 		throw errorQ.takeRetainedValue() as Error
 	}
-}
-
-
-/* This one is fully from me. */
-func secErrorFrom(statusCode: OSStatus) -> Err {
-#if os(macOS)
-	return .secError(code: statusCode, message: SecCopyErrorMessageString(statusCode, nil/* reserved for future use */) as String?)
-#else
-	return .secError(code: statusCode, message: nil)
-#endif
 }

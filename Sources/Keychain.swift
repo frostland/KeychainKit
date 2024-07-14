@@ -26,7 +26,7 @@ public enum Keychain {
 				return nil
 				
 			default:
-				throw secErrorFrom(statusCode: error)
+				throw Err(statusCode: error)
 		}
 	}
 	
@@ -56,7 +56,7 @@ public enum Keychain {
 			saveError = SecItemAdd(query as CFDictionary, nil)
 		}
 		if saveError != errSecSuccess {
-			throw secErrorFrom(statusCode: saveError)
+			throw Err(statusCode: saveError)
 		}
 		
 		/* Defensive programming!
@@ -73,7 +73,7 @@ public enum Keychain {
 				return
 				
 			default:
-				throw secErrorFrom(statusCode: error)
+				throw Err(statusCode: error)
 		}
 	}
 	
@@ -97,7 +97,7 @@ public enum Keychain {
 				return
 				
 			default:
-				throw secErrorFrom(statusCode: error)
+				throw Err(statusCode: error)
 		}
 	}
 	
