@@ -85,6 +85,138 @@ final class SecurityTests : XCTestCase {
 		})
 	}
 	
+#if os(macOS)
+	/* On non-macOS platforms retreiving the ref of a keychain item is not supported as SecKeychain does not exist.
+	 * The observed behaviour is the request succeeds(!) but returns a NULL ref. */
+	@available(macOS, deprecated: 10.10)
+	func testFetchItemRef() throws {
+		let baseQuery: [CFString : Any] = [
+			kSecClass: kSecClassGenericPassword,
+			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
+			kSecAttrService: "SecTest"
+		]
+		XCTAssertNoThrow(try secCall{
+			var query = baseQuery
+			query[kSecValueData] = Data([42])
+			return SecItemAdd(query as CFDictionary, nil)
+		})
+		
+		let ret = try secCall{
+			var query = baseQuery
+			query[kSecReturnRef] = kCFBooleanTrue
+			return SecItemCopyMatching(query as CFDictionary, $0)
+		}
+		XCTAssert(CFGetTypeID(ret) == SecKeychainItemGetTypeID())
+	}
+#endif
+	
+	func testFetchItemPersistentRef() throws {
+		let baseQuery: [CFString : Any] = [
+			kSecClass: kSecClassGenericPassword,
+			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
+			kSecAttrService: "SecTest"
+		]
+		XCTAssertNoThrow(try secCall{
+			var query = baseQuery
+			query[kSecValueData] = Data([42])
+			return SecItemAdd(query as CFDictionary, nil)
+		})
+		
+		let ret = try secCall{
+			var query = baseQuery
+			query[kSecReturnPersistentRef] = kCFBooleanTrue
+			return SecItemCopyMatching(query as CFDictionary, $0)
+		}
+		XCTAssert(CFGetTypeID(ret) == CFDataGetTypeID())
+	}
+	
+	func testFetchItemAttributes() throws {
+		let baseQuery: [CFString : Any] = [
+			kSecClass: kSecClassGenericPassword,
+			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
+			kSecAttrService: "SecTest"
+		]
+		XCTAssertNoThrow(try secCall{
+			var query = baseQuery
+			query[kSecValueData] = Data([42])
+			return SecItemAdd(query as CFDictionary, nil)
+		})
+		
+		let ret = try secCall{
+			var query = baseQuery
+			query[kSecReturnAttributes] = kCFBooleanTrue
+			return SecItemCopyMatching(query as CFDictionary, $0)
+		}
+		XCTAssert(CFGetTypeID(ret) == CFDictionaryGetTypeID())
+	}
+	
+	func testFetchItemData() throws {
+		let baseQuery: [CFString : Any] = [
+			kSecClass: kSecClassGenericPassword,
+			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
+			kSecAttrService: "SecTest"
+		]
+		XCTAssertNoThrow(try secCall{
+			var query = baseQuery
+			query[kSecValueData] = Data([42])
+			return SecItemAdd(query as CFDictionary, nil)
+		})
+		
+		let ret = try secCall{
+			var query = baseQuery
+			query[kSecReturnData] = kCFBooleanTrue
+			return SecItemCopyMatching(query as CFDictionary, $0)
+		}
+		XCTAssert(CFGetTypeID(ret) == CFDataGetTypeID())
+	}
+	
+	func testFetchItemDataAndAttributesAndPersistentRef() throws {
+		let baseQuery: [CFString : Any] = [
+			kSecClass: kSecClassGenericPassword,
+			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
+			kSecAttrService: "SecTest"
+		]
+		XCTAssertNoThrow(try secCall{
+			var query = baseQuery
+			query[kSecValueData] = Data([42])
+			return SecItemAdd(query as CFDictionary, nil)
+		})
+		
+		/* Surprisingly this does not fail!
+		 * It returns the attributes and the two additional keys: “v_Data” (kSecValueData) and “v_PersistentRef” (kSecValuePersistentRef). */
+		let ret = try secCall{
+			var query = baseQuery
+			query[kSecReturnData] = kCFBooleanTrue
+			query[kSecReturnAttributes] = kCFBooleanTrue
+			query[kSecReturnPersistentRef] = kCFBooleanTrue
+			return SecItemCopyMatching(query as CFDictionary, $0)
+		}
+		XCTAssert(CFGetTypeID(ret) == CFDictionaryGetTypeID())
+	}
+	
+	func testFetchItemDataAndPersistentRef() throws {
+		let baseQuery: [CFString : Any] = [
+			kSecClass: kSecClassGenericPassword,
+			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
+			kSecAttrService: "SecTest"
+		]
+		XCTAssertNoThrow(try secCall{
+			var query = baseQuery
+			query[kSecValueData] = Data([42])
+			return SecItemAdd(query as CFDictionary, nil)
+		})
+		
+		/* Surprisingly some attributes are returned anyway. */
+		let ret = try secCall{
+			var query = baseQuery
+			query[kSecReturnData] = kCFBooleanTrue
+			query[kSecReturnAttributes] = kCFBooleanFalse
+			query[kSecReturnPersistentRef] = kCFBooleanTrue
+			return SecItemCopyMatching(query as CFDictionary, $0)
+		}
+		XCTAssert(CFGetTypeID(ret) == CFDictionaryGetTypeID())
+	}
+	
 }
 
 
