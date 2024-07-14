@@ -1,0 +1,28 @@
+{
+  "configurations" : [
+    {
+      "id" : "36537E86-9467-49E8-96CB-B7E74198CB0F",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Keychain.xcodeproj",
+      "identifier" : "7BFA99A22C3B4EE0003AA8EE",
+      "name" : "KeychainTestsHost"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Keychain.xcodeproj",
+        "identifier" : "7B235F232C3B4B6000C13B8B",
+        "name" : "KeychainTests"
+      }
+    }
+  ],
+  "version" : 1
+}

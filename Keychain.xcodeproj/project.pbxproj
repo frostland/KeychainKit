@@ -38,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7B00C8BF2C4482B100254584 /* KeychainTestsHost.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KeychainTestsHost.xctestplan; sourceTree = SOURCE_ROOT; };
 		7B235F1C2C3B4B6000C13B8B /* KeychainKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KeychainKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B235F242C3B4B6000C13B8B /* KeychainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeychainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B235F292C3B4B6000C13B8B /* KeychainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTests.swift; sourceTree = "<group>"; };
@@ -117,6 +118,7 @@
 				7B60939F2C446BA700948803 /* Utils */,
 				7B235F292C3B4B6000C13B8B /* KeychainTests.swift */,
 				7B60939C2C44691D00948803 /* SecurityTests.swift */,
+				7B00C8BF2C4482B100254584 /* KeychainTestsHost.xctestplan */,
 			);
 			name = KeychainKitTests;
 			path = Tests;
