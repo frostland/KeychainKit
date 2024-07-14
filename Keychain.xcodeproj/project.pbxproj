@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7B00C8C12C448A6100254584 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B00C8C02C448A6100254584 /* Constants.swift */; };
 		7B235F252C3B4B6000C13B8B /* KeychainKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B235F1C2C3B4B6000C13B8B /* KeychainKit.framework */; };
 		7B235F2A2C3B4B6000C13B8B /* KeychainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B235F292C3B4B6000C13B8B /* KeychainTests.swift */; };
 		7B235F382C3B4CAE00C13B8B /* KeychainErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B235F352C3B4CAE00C13B8B /* KeychainErrors.swift */; };
@@ -39,6 +40,7 @@
 
 /* Begin PBXFileReference section */
 		7B00C8BF2C4482B100254584 /* KeychainTestsHost.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KeychainTestsHost.xctestplan; sourceTree = SOURCE_ROOT; };
+		7B00C8C02C448A6100254584 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		7B235F1C2C3B4B6000C13B8B /* KeychainKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KeychainKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B235F242C3B4B6000C13B8B /* KeychainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeychainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B235F292C3B4B6000C13B8B /* KeychainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTests.swift; sourceTree = "<group>"; };
@@ -107,6 +109,7 @@
 			children = (
 				7B235F362C3B4CAE00C13B8B /* Keychain.swift */,
 				7B235F352C3B4CAE00C13B8B /* KeychainErrors.swift */,
+				7B00C8C02C448A6100254584 /* Constants.swift */,
 			);
 			name = KeychainKit;
 			path = Sources;
@@ -300,6 +303,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7B00C8C12C448A6100254584 /* Constants.swift in Sources */,
 				7B235F392C3B4CAE00C13B8B /* Keychain.swift in Sources */,
 				7B235F382C3B4CAE00C13B8B /* KeychainErrors.swift in Sources */,
 			);
