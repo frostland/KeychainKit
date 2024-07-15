@@ -28,6 +28,60 @@ public extension Keychain.GenericPassword {
 		try Keychain.clearAll(ofClass: Self.securityClass, in: accessGroup)
 	}
 	
+	static func fetchAllMatchingFromKeychain(query: Keychain.GenericPassword, retrieveData: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> [Keychain.GenericPassword] {
+		var query = query.attributes
+		query[kSecMatchLimit]          = kSecMatchLimitAll
+		query[kSecClass]               = kSecClassGenericPassword
+		query[kSecReturnAttributes]    = kCFBooleanTrue
+		query[kSecReturnRef]           = (retrieveRef           ? kCFBooleanTrue : kCFBooleanFalse)
+		query[kSecReturnData]          = (retrieveData          ? kCFBooleanTrue : kCFBooleanFalse)
+		query[kSecReturnPersistentRef] = (retrievePersistentRef ? kCFBooleanTrue : kCFBooleanFalse)
+		if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
+			/* Make the keychain behave like iOS/watchOS/etc. on macOS.
+			 * The previous behaviour is soft-deprecated; we do not support it at all. */
+			query[kSecUseDataProtectionKeychain] = kCFBooleanTrue
+		}
+#if os(macOS)
+		if #unavailable(macOS 10.15), query[kSecAttrAccessGroup] != nil {
+			throw Err.accessGroupNotSupported
+		}
+#endif
+		guard let results: [[CFString: Any]] = try Keychain.performSearch(query) else {
+			return []
+		}
+		return results.map(Keychain.GenericPassword.init(attributes:))
+	}
+	
+	/**
+	 If more than one is matching, the ``KeychainError.multipleMatches`` error is thrown.
+	 If nothing matches `nil` is returned. */
+	static func fetchOnlyMatchingFromKeychain(query: Keychain.GenericPassword, retrieveData: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> Keychain.GenericPassword? {
+		var query = query.attributes
+		query[kSecMatchLimit]          = 2
+		query[kSecClass]               = kSecClassGenericPassword
+		query[kSecReturnAttributes]    = kCFBooleanTrue
+		query[kSecReturnRef]           = (retrieveRef           ? kCFBooleanTrue : kCFBooleanFalse)
+		query[kSecReturnData]          = (retrieveData          ? kCFBooleanTrue : kCFBooleanFalse)
+		query[kSecReturnPersistentRef] = (retrievePersistentRef ? kCFBooleanTrue : kCFBooleanFalse)
+		if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
+			/* Make the keychain behave like iOS/watchOS/etc. on macOS.
+			 * The previous behaviour is soft-deprecated; we do not support it at all. */
+			query[kSecUseDataProtectionKeychain] = kCFBooleanTrue
+		}
+#if os(macOS)
+		if #unavailable(macOS 10.15), query[kSecAttrAccessGroup] != nil {
+			throw Err.accessGroupNotSupported
+		}
+#endif
+		guard let results: [[CFString: Any]] = try Keychain.performSearch(query), let result = results.first else {
+			return nil
+		}
+		guard results.count == 1 else {
+			throw Err.multipleMatches
+		}
+		return .init(attributes: result)
+	}
+	
 }
 
 
