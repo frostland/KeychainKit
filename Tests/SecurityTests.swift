@@ -228,13 +228,15 @@ extension KeychainError : Equatable {
 			case (.clearingKeychainOnNonSandboxedEnvironment, .clearingKeychainOnNonSandboxedEnvironment): return true
 			case (.secError(let c1, _),                       .secError(let c2, _)):                       return c1 == c2
 			case (.invalidResponseFromSecurityFramework,      .invalidResponseFromSecurityFramework):      return true
-			case (.internalError,                             .internalError):                             return true
+			case (.multipleMatches,                           .multipleMatches):                           return true
+			case (.unexpectedResultType,                      .unexpectedResultType):                      return true
 				
 			case (.accessGroupNotSupported,                   _): return false
 			case (.clearingKeychainOnNonSandboxedEnvironment, _): return false
 			case (.secError,                                  _): return false
 			case (.invalidResponseFromSecurityFramework,      _): return false
-			case (.internalError,                             _): return false
+			case (.multipleMatches,                           _): return false
+			case (.unexpectedResultType,                      _): return false
 		}
 	}
 	

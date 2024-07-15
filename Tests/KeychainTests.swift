@@ -26,9 +26,10 @@ final class KeychainTests : XCTestCase {
 		
 		let ret = try XCTUnwrap(Keychain.performSearch({
 			var query = baseQuery
+			query[kSecReturnAttributes] = kCFBooleanTrue
 			query[kSecReturnPersistentRef] = kCFBooleanTrue
 			return query
-		}()))
+		}()) as [CFString: Any]?)
 		XCTAssertNotNil(ret[kSecValuePersistentRef])
 	}
 	
@@ -48,7 +49,7 @@ final class KeychainTests : XCTestCase {
 		let data = Data("hello!".utf8)
 		let keychainID = "fr.frostland.Keychain.testClearKeychain"
 		XCTAssertNoThrow(try Keychain.setStoredData(data, withIdentifier: keychainID))
-		XCTAssertNoThrow(try Keychain.clearKeychain())
+		XCTAssertNoThrow(try Keychain.GenericPassword.clearAll())
 		XCTAssertNil(try Keychain.getStoredData(withIdentifier: keychainID))
 	}
 	
@@ -75,7 +76,7 @@ final class KeychainTests : XCTestCase {
 		let accessGroup = "DVL8GW97S8.fr.frostland.KeychainTestsHost.shared"
 		let keychainID = "fr.frostland.Keychain.testClearKeychainAccessGroup"
 		XCTAssertNoThrow(try Keychain.setStoredData(data, withIdentifier: keychainID, accessGroup: accessGroup))
-		XCTAssertNoThrow(try Keychain.clearKeychain(accessGroup: accessGroup))
+		XCTAssertNoThrow(try Keychain.GenericPassword.clearAll(in: accessGroup))
 		XCTAssertNil(try Keychain.getStoredData(withIdentifier: keychainID, accessGroup: accessGroup))
 	}
 	
