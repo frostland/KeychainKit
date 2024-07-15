@@ -8,12 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		7B00C8C12C448A6100254584 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B00C8C02C448A6100254584 /* Constants.swift */; };
+		7B00C8C32C44969300254584 /* Keychain+PerformQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B00C8C22C44969300254584 /* Keychain+PerformQueries.swift */; };
+		7B00C8C52C44970200254584 /* Keychain+Conveniences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B00C8C42C44970200254584 /* Keychain+Conveniences.swift */; };
 		7B235F252C3B4B6000C13B8B /* KeychainKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B235F1C2C3B4B6000C13B8B /* KeychainKit.framework */; };
 		7B235F2A2C3B4B6000C13B8B /* KeychainTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B235F292C3B4B6000C13B8B /* KeychainTests.swift */; };
 		7B235F382C3B4CAE00C13B8B /* KeychainErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B235F352C3B4CAE00C13B8B /* KeychainErrors.swift */; };
 		7B235F392C3B4CAE00C13B8B /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B235F362C3B4CAE00C13B8B /* Keychain.swift */; };
 		7B60939D2C44691D00948803 /* SecurityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B60939C2C44691D00948803 /* SecurityTests.swift */; };
 		7B60939E2C446B9B00948803 /* SecUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B235F342C3B4CAE00C13B8B /* SecUtils.swift */; };
+		7B6093A12C447AF100948803 /* Keychain.GenericPassword.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6093A02C447AF100948803 /* Keychain.GenericPassword.swift */; };
 		7BB003982C3B58FC00DB1082 /* KeychainKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B235F1C2C3B4B6000C13B8B /* KeychainKit.framework */; };
 		7BFA99A62C3B4EE0003AA8EE /* KeychainTestsHostApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA99A52C3B4EE0003AA8EE /* KeychainTestsHostApp.swift */; };
 		7BFA99A82C3B4EE0003AA8EE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BFA99A72C3B4EE0003AA8EE /* ContentView.swift */; };
@@ -41,6 +44,8 @@
 /* Begin PBXFileReference section */
 		7B00C8BF2C4482B100254584 /* KeychainTestsHost.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = KeychainTestsHost.xctestplan; sourceTree = SOURCE_ROOT; };
 		7B00C8C02C448A6100254584 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		7B00C8C22C44969300254584 /* Keychain+PerformQueries.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Keychain+PerformQueries.swift"; sourceTree = "<group>"; };
+		7B00C8C42C44970200254584 /* Keychain+Conveniences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Keychain+Conveniences.swift"; sourceTree = "<group>"; };
 		7B235F1C2C3B4B6000C13B8B /* KeychainKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KeychainKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B235F242C3B4B6000C13B8B /* KeychainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeychainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B235F292C3B4B6000C13B8B /* KeychainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTests.swift; sourceTree = "<group>"; };
@@ -48,6 +53,7 @@
 		7B235F352C3B4CAE00C13B8B /* KeychainErrors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainErrors.swift; sourceTree = "<group>"; };
 		7B235F362C3B4CAE00C13B8B /* Keychain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		7B60939C2C44691D00948803 /* SecurityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityTests.swift; sourceTree = "<group>"; };
+		7B6093A02C447AF100948803 /* Keychain.GenericPassword.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.GenericPassword.swift; sourceTree = "<group>"; };
 		7BFA99A32C3B4EE0003AA8EE /* KeychainTestsHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeychainTestsHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BFA99A52C3B4EE0003AA8EE /* KeychainTestsHostApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTestsHostApp.swift; sourceTree = "<group>"; };
 		7BFA99A72C3B4EE0003AA8EE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -108,6 +114,9 @@
 			isa = PBXGroup;
 			children = (
 				7B235F362C3B4CAE00C13B8B /* Keychain.swift */,
+				7B00C8C42C44970200254584 /* Keychain+Conveniences.swift */,
+				7B00C8C22C44969300254584 /* Keychain+PerformQueries.swift */,
+				7B6093A02C447AF100948803 /* Keychain.GenericPassword.swift */,
 				7B235F352C3B4CAE00C13B8B /* KeychainErrors.swift */,
 				7B00C8C02C448A6100254584 /* Constants.swift */,
 			);
@@ -304,7 +313,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B00C8C12C448A6100254584 /* Constants.swift in Sources */,
+				7B6093A12C447AF100948803 /* Keychain.GenericPassword.swift in Sources */,
 				7B235F392C3B4CAE00C13B8B /* Keychain.swift in Sources */,
+				7B00C8C52C44970200254584 /* Keychain+Conveniences.swift in Sources */,
+				7B00C8C32C44969300254584 /* Keychain+PerformQueries.swift in Sources */,
 				7B235F382C3B4CAE00C13B8B /* KeychainErrors.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

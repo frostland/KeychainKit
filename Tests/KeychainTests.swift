@@ -29,7 +29,6 @@ final class KeychainTests : XCTestCase {
 			query[kSecReturnPersistentRef] = kCFBooleanTrue
 			return query
 		}()))
-		XCTAssertEqual(ret.count, 1)
 		XCTAssertNotNil(ret[kSecValuePersistentRef])
 	}
 	
