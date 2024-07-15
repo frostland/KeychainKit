@@ -49,6 +49,29 @@ public extension Keychain.GenericPassword {
 
 public extension Keychain.GenericPassword {
 	
+	/* No convenience access for kSecAttrAccess (macOS only, softly deprecated (SecKeychain only)) */
+	
+	/* Primary key:
+	 * - kSecAttrAccessGroup
+	 * - kSecAttrAccount
+	 * - kSecAttrService
+	 * - kSecAttrSynchronizable */
+	
+	var value: Data? {
+		get {typedAttribute(for: kSecValueData)}
+		set {attributes[kSecValueData] = newValue as CFData?}
+	}
+	
+	var ref: SecKeychainItem? {
+		get {typedAttribute(for: kSecValueRef)}
+		set {attributes[kSecValueRef] = newValue}
+	}
+	
+	var persistentRef: Data? {
+		get {typedAttribute(for: kSecValuePersistentRef)}
+		set {attributes[kSecValuePersistentRef] = newValue as CFData?}
+	}
+	
 	/** Access to `kSecAttrSynchronizable`. */
 	var synchronizable: Bool? {
 		get {
@@ -117,14 +140,6 @@ public extension Keychain.GenericPassword {
 		get {typedAttribute(for: kSecAttrAccessible)}
 		set {attributes[kSecAttrAccessible] = newValue}
 	}
-	
-	/* No convenience access for kSecAttrAccess (macOS only, softly deprecated (SecKeychain only)) */
-	
-	/* Primary key:
-	 * - kSecAttrAccessGroup
-	 * - kSecAttrAccount
-	 * - kSecAttrService
-	 * - kSecAttrSynchronizable */
 	
 	/** Access to `kSecAttrCreationDate`. */
 	var creationDate: Date? {
