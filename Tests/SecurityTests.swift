@@ -10,7 +10,7 @@ import XCTest
 final class SecurityTests : XCTestCase {
 	
 	override func setUp() async throws {
-		try Keychain.clearKeychain()
+		try Keychain.GenericPassword.clearAll()
 	}
 	
 	func testUpdateServiceAccountGeneric() throws {

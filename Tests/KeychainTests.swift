@@ -9,7 +9,7 @@ import XCTest
 final class KeychainTests : XCTestCase {
 	
 	override func setUp() async throws {
-		try Keychain.clearKeychain()
+		try Keychain.GenericPassword.clearAll()
 	}
 	
 	func testPerformSearch() throws {

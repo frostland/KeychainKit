@@ -81,31 +81,6 @@ public enum Keychain {
 		}
 	}
 	
-	@available(*, deprecated)
-	public static func clearKeychain(accessGroup: String? = nil) throws {
-		var query: [CFString: Any] = [kSecClass: kSecClassGenericPassword]
-		if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
-			/* See baseQuery(…) for info about this. */
-			query[kSecUseDataProtectionKeychain] = kCFBooleanTrue
-		} else {
-#if os(macOS)
-			throw Err.clearingKeychainOnNonSandboxedEnvironment
-#endif
-		}
-		if let accessGroup {
-			query[kSecAttrAccessGroup] = accessGroup
-		}
-		
-		let error = SecItemDelete(query as CFDictionary)
-		switch error {
-			case errSecSuccess, errSecItemNotFound:
-				return
-				
-			default:
-				throw Err(statusCode: error)
-		}
-	}
-	
 	/* ***************
 	   MARK: - Private
 	   *************** */
