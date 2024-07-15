@@ -92,9 +92,9 @@ public extension Keychain.GenericPassword {
 	 * - kSecAttrAccessibleAfterFirstUnlock
 	 * - (deprecated) kSecAttrAccessibleAlwaysThisDeviceOnly
 	 * - (deprecated) kSecAttrAccessibleAlways */
-	var accessibility: String? {
+	var accessibility: CFString? {
 		get {typedAttribute(for: kSecAttrAccessible)}
-		set {attributes[kSecAttrAccessible] = newValue as CFString?}
+		set {attributes[kSecAttrAccessible] = newValue}
 	}
 	
 	/* No convenience access for:
