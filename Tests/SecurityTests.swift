@@ -217,6 +217,54 @@ final class SecurityTests : XCTestCase {
 		XCTAssert(CFGetTypeID(ret) == CFDictionaryGetTypeID())
 	}
 	
+	func testFetchTwoElements() throws {
+		let baseQuery: [CFString: Any] = [
+			kSecClass: kSecClassGenericPassword,
+			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
+			kSecAttrService: "SecTest"
+		]
+		
+		XCTAssertNoThrow(try secCall{
+			var query = baseQuery
+			query[kSecAttrAccount] = "yolo1"
+			query[kSecValueData] = Data([42])
+			return SecItemAdd(query as CFDictionary, nil)
+		})
+		let ret1 = try secCall{
+			var query = baseQuery
+			query[kSecMatchLimit] = kSecMatchLimitAll
+			query[kSecReturnData] = kCFBooleanTrue
+			query[kSecReturnAttributes] = kCFBooleanTrue
+			return SecItemCopyMatching(query as CFDictionary, $0)
+		}
+		XCTAssert(CFGetTypeID(ret1) == CFArrayGetTypeID())
+		
+		XCTAssertNoThrow(try secCall{
+			var query = baseQuery
+			query[kSecAttrAccount] = "yolo2"
+			query[kSecValueData] = Data([42])
+			return SecItemAdd(query as CFDictionary, nil)
+		})
+		let ret2 = try secCall{
+			var query = baseQuery
+			query[kSecMatchLimit] = kSecMatchLimitAll
+			query[kSecReturnData] = kCFBooleanTrue
+			query[kSecReturnAttributes] = kCFBooleanTrue
+			return SecItemCopyMatching(query as CFDictionary, $0)
+		}
+		XCTAssert(CFGetTypeID(ret2) == CFArrayGetTypeID())
+		
+		/* Returns the “first one” matching (which is undefined AFAIK). */
+		let ret3 = try secCall{
+			var query = baseQuery
+			query[kSecMatchLimit] = kSecMatchLimitOne
+			query[kSecReturnData] = kCFBooleanTrue
+			query[kSecReturnAttributes] = kCFBooleanTrue
+			return SecItemCopyMatching(query as CFDictionary, $0)
+		}
+		XCTAssert(CFGetTypeID(ret3) == CFDictionaryGetTypeID())
+	}
+	
 }
 
 
