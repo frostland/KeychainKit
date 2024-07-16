@@ -28,8 +28,20 @@ public enum KeychainError : Error {
 #endif
 	}
 	
+	public var isItemNotFoundError: Bool {
+		return isSecItemError(code: errSecItemNotFound)
+	}
+	
+	public var isDuplicateItemError: Bool {
+		return isSecItemError(code: errSecDuplicateItem)
+	}
+	
 	public var isProtectedDataUnavailableError: Bool {
-		if case .secError(errSecInteractionNotAllowed, _) = self {
+		return isSecItemError(code: errSecInteractionNotAllowed)
+	}
+	
+	public func isSecItemError(code: OSStatus) -> Bool {
+		if case .secError(code, _) = self {
 			return true
 		}
 		return false

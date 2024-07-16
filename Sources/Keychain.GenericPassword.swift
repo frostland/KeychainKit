@@ -16,6 +16,23 @@ public extension Keychain {
 		 You should rarely have to use this property directly.
 		 Instead you should use the conveniences that access/modify it. */
 		public var attributes: [CFString: Any]
+		public var attributesNoClass: [CFString: Any] {
+			var ret = attributes
+			ret.removeValue(forKey: kSecClass)
+			return ret
+		}
+		
+		public init(attributes: [CFString: Any]) {
+			if attributes[kSecClass] as? String != kSecClassGenericPassword as String {
+				os_log("Initing a GenericPassword with attributes containing a value for the kSecClass attribute different than kSecClassGenericPassword (got %@).", log: logger, type: .error, String(describing: attributes[kSecClass]))
+			}
+			self.attributes = attributes
+		}
+		
+		public init(attributesNoClass: [CFString: Any]) {
+			self.attributes = attributesNoClass
+			attributes[kSecClass] = kSecClassGenericPassword
+		}
 		
 	}
 	
@@ -36,50 +53,69 @@ public extension Keychain.GenericPassword {
 		query[kSecReturnRef]           = (retrieveRef           ? kCFBooleanTrue : kCFBooleanFalse)
 		query[kSecReturnData]          = (retrieveData          ? kCFBooleanTrue : kCFBooleanFalse)
 		query[kSecReturnPersistentRef] = (retrievePersistentRef ? kCFBooleanTrue : kCFBooleanFalse)
-		if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
-			/* Make the keychain behave like iOS/watchOS/etc. on macOS.
-			 * The previous behaviour is soft-deprecated; we do not support it at all. */
-			query[kSecUseDataProtectionKeychain] = kCFBooleanTrue
-		}
-#if os(macOS)
-		if #unavailable(macOS 10.15), query[kSecAttrAccessGroup] != nil {
-			throw Err.accessGroupNotSupported
-		}
-#endif
 		guard let results: [[CFString: Any]] = try Keychain.performSearch(query) else {
 			return []
 		}
-		return results.map(Keychain.GenericPassword.init(attributes:))
+		return results.map(Keychain.GenericPassword.init(attributesNoClass:))
 	}
 	
 	/**
 	 If more than one is matching, the ``KeychainError.multipleMatches`` error is thrown.
 	 If nothing matches `nil` is returned. */
-	static func fetchOnlyMatchingFromKeychain(query: Keychain.GenericPassword, retrieveData: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> Keychain.GenericPassword? {
+	static func fetchOnlyMatchingFromKeychain(query: Keychain.GenericPassword, retrieveValue: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> Keychain.GenericPassword? {
 		var query = query.attributes
 		query[kSecMatchLimit]          = 2
 		query[kSecClass]               = kSecClassGenericPassword
 		query[kSecReturnAttributes]    = kCFBooleanTrue
 		query[kSecReturnRef]           = (retrieveRef           ? kCFBooleanTrue : kCFBooleanFalse)
-		query[kSecReturnData]          = (retrieveData          ? kCFBooleanTrue : kCFBooleanFalse)
+		query[kSecReturnData]          = (retrieveValue         ? kCFBooleanTrue : kCFBooleanFalse)
 		query[kSecReturnPersistentRef] = (retrievePersistentRef ? kCFBooleanTrue : kCFBooleanFalse)
-		if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *) {
-			/* Make the keychain behave like iOS/watchOS/etc. on macOS.
-			 * The previous behaviour is soft-deprecated; we do not support it at all. */
-			query[kSecUseDataProtectionKeychain] = kCFBooleanTrue
-		}
-#if os(macOS)
-		if #unavailable(macOS 10.15), query[kSecAttrAccessGroup] != nil {
-			throw Err.accessGroupNotSupported
-		}
-#endif
 		guard let results: [[CFString: Any]] = try Keychain.performSearch(query), let result = results.first else {
 			return nil
 		}
 		guard results.count == 1 else {
 			throw Err.multipleMatches
 		}
-		return .init(attributes: result)
+		return .init(attributesNoClass: result)
+	}
+	
+	init(service: String? = nil, account: String? = nil, accessGroup: String? = nil, synchronizable: Bool? = nil, generic: Data? = nil, value: Data? = nil) {
+		self.init(attributes: [
+			kSecClass: kSecClassGenericPassword
+		])
+		if let service        {self.service        = service}
+		if let account        {self.account        = account}
+		if let accessGroup    {self.accessGroup    = accessGroup}
+		if let synchronizable {self.synchronizable = synchronizable}
+		if let generic        {self.generic        = generic}
+		if let value          {self.value          = value}
+	}
+	
+	init(primaryKeyOf otherPassword: Keychain.GenericPassword) {
+		self.init(service: otherPassword.service, account: otherPassword.account, accessGroup: otherPassword.accessGroup, synchronizable: otherPassword.synchronizable)
+	}
+	
+	func upsertInKeychain(updatedAttributes: Keychain.GenericPassword) throws {
+		do {
+			/* AFAIK the Security framework does not support upsert, so we have to simulate it.
+			 * This is prone to race conditions; I know.
+			 * That being said, the only issue would be for a matching item to be inserted before we get the chance to execute the catch block,
+			 *  in which case we’ll get a duplicated item error anyways, so it’s not a big deal.
+			 *
+			 * We try updating first.
+			 * We could probably have tried the insertion first instead, but we had to chose something… */
+			try Keychain.performUpdate(of: attributes, updatedAttributes: updatedAttributes.attributesNoClass)
+		} catch let err as KeychainError where err.isItemNotFoundError {
+			var newEntryAttributes = attributes
+			for (k, v) in updatedAttributes.attributesNoClass {
+				newEntryAttributes[k] = v
+			}
+			try Keychain.performInsert(attributes: newEntryAttributes)
+		}
+	}
+	
+	func deleteFromKeychain() throws {
+		try Keychain.performDelete(attributes)
 	}
 	
 }
@@ -106,9 +142,9 @@ public extension Keychain.GenericPassword {
 	/* No convenience access for kSecAttrAccess (macOS only, softly deprecated (SecKeychain only)) */
 	
 	/* Primary key:
-	 * - kSecAttrAccessGroup
-	 * - kSecAttrAccount
 	 * - kSecAttrService
+	 * - kSecAttrAccount
+	 * - kSecAttrAccessGroup
 	 * - kSecAttrSynchronizable */
 	
 	var value: Data? {
@@ -143,7 +179,7 @@ public extension Keychain.GenericPassword {
 			/* We set the value to kSecAttrSynchronizableAny if synchronizable is set to nil as it’s most likely what the client wants
 			 *  (use the attributes in a query to search both synchronizable and non-synchronizable elements).
 			 * If the goal is to get the attributes to update an element, a concrete value would probably be set… */
-			if let newValue {attributes[kSecAttrSynchronizable] = newValue}
+			if let newValue {attributes[kSecAttrSynchronizable] = newValue as CFBoolean}
 			else            {attributes[kSecAttrSynchronizable] = kSecAttrSynchronizableAny}
 		}
 	}
