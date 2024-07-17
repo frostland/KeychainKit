@@ -79,6 +79,20 @@ public extension Keychain.GenericPassword {
 		return .init(attributesNoClass: result)
 	}
 	
+	func fetchAnyMatchingFromKeychain(retrieveValue: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> Keychain.GenericPassword? {
+		var query = attributes
+		query[kSecMatchLimit]          = kSecMatchLimitOne
+		query[kSecClass]               = kSecClassGenericPassword
+		query[kSecReturnAttributes]    = kCFBooleanTrue
+		query[kSecReturnRef]           = (retrieveRef           ? kCFBooleanTrue : kCFBooleanFalse)
+		query[kSecReturnData]          = (retrieveValue         ? kCFBooleanTrue : kCFBooleanFalse)
+		query[kSecReturnPersistentRef] = (retrievePersistentRef ? kCFBooleanTrue : kCFBooleanFalse)
+		guard let result: [CFString: Any] = try Keychain.performSearch(query) else {
+			return nil
+		}
+		return .init(attributesNoClass: result)
+	}
+	
 	init(service: String? = nil, account: String? = nil, accessGroup: String? = nil, synchronizable: Bool? = nil, generic: Data? = nil, value: Data? = nil) {
 		self.init(attributes: [
 			kSecClass: kSecClassGenericPassword
