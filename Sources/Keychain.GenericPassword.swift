@@ -95,6 +95,14 @@ public extension Keychain.GenericPassword {
 		self.init(service: otherPassword.service, account: otherPassword.account, accessGroup: otherPassword.accessGroup, synchronizable: otherPassword.synchronizable)
 	}
 	
+	func insertInKeychain(withUpdatedAttributes updatedAttributes: Keychain.GenericPassword = .init()) throws {
+		var newEntryAttributes = attributes
+		for (k, v) in updatedAttributes.attributesNoClass {
+			newEntryAttributes[k] = v
+		}
+		try Keychain.performInsert(attributes: newEntryAttributes)
+	}
+	
 	func upsertInKeychain(updatedAttributes: Keychain.GenericPassword) throws {
 		do {
 			/* AFAIK the Security framework does not support upsert, so we have to simulate it.
@@ -106,11 +114,53 @@ public extension Keychain.GenericPassword {
 			 * We could probably have tried the insertion first instead, but we had to chose something… */
 			try Keychain.performUpdate(of: attributes, updatedAttributes: updatedAttributes.attributesNoClass)
 		} catch let err as KeychainError where err.isItemNotFoundError {
-			var newEntryAttributes = attributes
-			for (k, v) in updatedAttributes.attributesNoClass {
-				newEntryAttributes[k] = v
+			try insertInKeychain(withUpdatedAttributes: updatedAttributes)
+		}
+	}
+	
+	/**
+	 Upsert the generic password in the keychain, checking if it was modified before upserting.
+	 
+	 The generation ID that is used to check the lease **MUST** be stored in the generic attribute of the password.
+	 The local ID must be in the receiver, the new ID must be in the updated attributes.
+	 
+	 If you do not have a local ID yet (first upsert), do set a “known” value for the initial ID
+	  (decide a value and use it everywhere you do a first upsert with lease).
+	 An empty generic is acceptable.
+	 
+	 The function will assert a generation ID is present in the ``generic`` property of the receiver and the updated attributes.
+	 
+	 The following algorithm is used to check the lease before modifying the element:
+	 - Request a modification of the element matching the primary keys + the generic;
+	 - If Keychain finds the element, we’re good;
+	 - If not:
+	   - First we fetch the password matching only the primary keys this time;
+	   - If a password is found, the item was modified in the Keychain and we have an obsolete value. We return `nil` to let the client know that;
+	   - If no password is found, we create the item (which fails if another process updates the entry in between).
+	 
+	 I _think_ there is still a race possible.
+	 Specifically if we allow the keychain entry to be removed, it is possible to have:
+	 - t1: Update the password;
+	 - t2: Tries to update the password -> fails because updated in t1;
+	 - t3 (or t1): Remove the password;
+	 - t2: Searches for keychain entry w/o generic, does not find it.
+	 It will thus create a new password, but should have aborted the operation instead.
+	 
+	 The solution for this race would be either to never remove the password (e.g. set to some empty value instead),
+	  or say we don’t care as the issue is very niche. */
+	func upsertInKeychainWithLease(updatedAttributes: Keychain.GenericPassword) throws {
+		assert(generic != nil && updatedAttributes.generic != nil)
+		do {
+			try Keychain.performUpdate(of: attributes, updatedAttributes: updatedAttributes.attributesNoClass)
+		} catch let err as KeychainError where err.isItemNotFoundError {
+			/* Let’s see if we can find the item without the generic. */
+			var query = self
+			query.attributes[kSecAttrGeneric] = nil
+			guard try Self.fetchOnlyMatchingFromKeychain(query: query, retrieveValue: false) == nil else {
+				throw Err.localItemOutOfDate
 			}
-			try Keychain.performInsert(attributes: newEntryAttributes)
+			/* The item was not found, we can create it. */
+			try insertInKeychain(withUpdatedAttributes: updatedAttributes)
 		}
 	}
 	

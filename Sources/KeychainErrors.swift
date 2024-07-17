@@ -18,6 +18,9 @@ public enum KeychainError : Error {
 	case invalidResponseFromSecurityFramework
 	case unexpectedResultType
 	
+	/** Thrown when an item is upserted with lease and the local value was out-of-date. */
+	case localItemOutOfDate
+	
 	case secError(code: OSStatus, message: String?)
 	
 	internal init(statusCode: OSStatus) {
