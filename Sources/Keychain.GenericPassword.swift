@@ -45,8 +45,8 @@ public extension Keychain.GenericPassword {
 		try Keychain.clearAll(ofClass: Self.securityClass, in: accessGroup)
 	}
 	
-	static func fetchAllMatchingFromKeychain(query: Keychain.GenericPassword, retrieveData: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> [Keychain.GenericPassword] {
-		var query = query.attributes
+	func fetchAllMatchingFromKeychain(retrieveData: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> [Keychain.GenericPassword] {
+		var query = attributes
 		query[kSecMatchLimit]          = kSecMatchLimitAll
 		query[kSecClass]               = kSecClassGenericPassword
 		query[kSecReturnAttributes]    = kCFBooleanTrue
@@ -62,8 +62,8 @@ public extension Keychain.GenericPassword {
 	/**
 	 If more than one is matching, the ``KeychainError.multipleMatches`` error is thrown.
 	 If nothing matches `nil` is returned. */
-	static func fetchOnlyMatchingFromKeychain(query: Keychain.GenericPassword, retrieveValue: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> Keychain.GenericPassword? {
-		var query = query.attributes
+	func fetchOnlyMatchingFromKeychain(retrieveValue: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> Keychain.GenericPassword? {
+		var query = attributes
 		query[kSecMatchLimit]          = 2
 		query[kSecClass]               = kSecClassGenericPassword
 		query[kSecReturnAttributes]    = kCFBooleanTrue
@@ -157,7 +157,7 @@ public extension Keychain.GenericPassword {
 			/* Let’s see if we can find the item without the generic. */
 			var query = self
 			query.attributes[kSecAttrGeneric] = nil
-			guard try Self.fetchOnlyMatchingFromKeychain(query: query, retrieveValue: false) == nil else {
+			guard try query.fetchOnlyMatchingFromKeychain(retrieveValue: false) == nil else {
 				throw Err.localItemOutOfDate
 			}
 			/* The item was not found, we can create it. */

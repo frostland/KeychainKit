@@ -39,12 +39,14 @@ final class KeychainTests : XCTestCase {
 		let keychainID = "fr.frostland.Keychain.testBasicStorage"
 		let query = Keychain.GenericPassword(service: keychainID)
 		let queryWithAccessGroup = Keychain.GenericPassword(service: keychainID, accessGroup: accessGroup)
-		XCTAssertNil(try Keychain.GenericPassword.fetchOnlyMatchingFromKeychain(query: query, retrieveValue: true))
+		XCTAssertNil(try query.fetchOnlyMatchingFromKeychain(retrieveValue: true))
 		XCTAssertNoThrow(try query.upsertInKeychain(updatedAttributes: .init(value: data)))
-		XCTAssertEqual(try Keychain.GenericPassword.fetchOnlyMatchingFromKeychain(query: query, retrieveValue: true)?.value, data)
-		XCTAssertEqual(try Keychain.GenericPassword.fetchOnlyMatchingFromKeychain(query: queryWithAccessGroup, retrieveValue: true)?.value, data)
+		XCTAssertEqual(try query.fetchOnlyMatchingFromKeychain(retrieveValue: true)?.value, data)
+		XCTAssertEqual(try query.fetchAnyMatchingFromKeychain(retrieveValue: true)?.value, data)
+		XCTAssertEqual(try queryWithAccessGroup.fetchOnlyMatchingFromKeychain(retrieveValue: true)?.value, data)
 		XCTAssertNoThrow(try query.deleteFromKeychain())
-		XCTAssertNil(try Keychain.GenericPassword.fetchOnlyMatchingFromKeychain(query: query, retrieveValue: true))
+		XCTAssertNil(try query.fetchOnlyMatchingFromKeychain(retrieveValue: true))
+		XCTAssertNil(try query.fetchAnyMatchingFromKeychain(retrieveValue: true))
 	}
 	
 	func testClearKeychain() throws {
@@ -53,7 +55,7 @@ final class KeychainTests : XCTestCase {
 		let query = Keychain.GenericPassword(service: keychainID)
 		XCTAssertNoThrow(try query.upsertInKeychain(updatedAttributes: .init(value: data)))
 		XCTAssertNoThrow(try Keychain.GenericPassword.clearAll())
-		XCTAssertNil(try Keychain.GenericPassword.fetchOnlyMatchingFromKeychain(query: query, retrieveValue: true))
+		XCTAssertNil(try query.fetchOnlyMatchingFromKeychain(retrieveValue: true))
 	}
 	
 	func testBasicStorageAccessGroup() throws {
@@ -64,17 +66,17 @@ final class KeychainTests : XCTestCase {
 		let query = Keychain.GenericPassword(service: keychainID)
 		let queryWithAccessGroup = Keychain.GenericPassword(service: keychainID, accessGroup: accessGroup)
 		let queryWithAccessGroupShared = Keychain.GenericPassword(service: keychainID, accessGroup: accessGroupShared)
-		XCTAssertNil(try Keychain.GenericPassword.fetchOnlyMatchingFromKeychain(query: queryWithAccessGroup, retrieveValue: true))
-		XCTAssertNil(try Keychain.GenericPassword.fetchOnlyMatchingFromKeychain(query: queryWithAccessGroupShared, retrieveValue: true))
+		XCTAssertNil(try queryWithAccessGroup.fetchOnlyMatchingFromKeychain(retrieveValue: true))
+		XCTAssertNil(try queryWithAccessGroupShared.fetchOnlyMatchingFromKeychain(retrieveValue: true))
 		XCTAssertNoThrow(try queryWithAccessGroupShared.upsertInKeychain(updatedAttributes: .init(value: data)))
-		XCTAssertEqual(try Keychain.GenericPassword.fetchOnlyMatchingFromKeychain(query: queryWithAccessGroupShared, retrieveValue: true)?.value, data)
+		XCTAssertEqual(try queryWithAccessGroupShared.fetchOnlyMatchingFromKeychain(retrieveValue: true)?.value, data)
 		/* If the access group is not specified, all the access groups are searched.
 		 * I think it is not possible to change this behavious (to search only the default one):
 		 *  if this is needed, the default access group must be manually specified. */
-		XCTAssertEqual(try Keychain.GenericPassword.fetchOnlyMatchingFromKeychain(query: query, retrieveValue: true)?.value, data)
-		XCTAssertNil(try Keychain.GenericPassword.fetchOnlyMatchingFromKeychain(query: queryWithAccessGroup, retrieveValue: true))
+		XCTAssertEqual(try query.fetchOnlyMatchingFromKeychain(retrieveValue: true)?.value, data)
+		XCTAssertNil(try queryWithAccessGroup.fetchOnlyMatchingFromKeychain(retrieveValue: true))
 		XCTAssertNoThrow(try queryWithAccessGroupShared.deleteFromKeychain())
-		XCTAssertNil(try Keychain.GenericPassword.fetchOnlyMatchingFromKeychain(query: queryWithAccessGroupShared, retrieveValue: true))
+		XCTAssertNil(try queryWithAccessGroupShared.fetchOnlyMatchingFromKeychain(retrieveValue: true))
 	}
 	
 	func testClearKeychainAccessGroup() throws {
@@ -84,7 +86,7 @@ final class KeychainTests : XCTestCase {
 		let query = Keychain.GenericPassword(service: keychainID, accessGroup: accessGroup)
 		XCTAssertNoThrow(try query.upsertInKeychain(updatedAttributes: .init(value: data)))
 		XCTAssertNoThrow(try Keychain.GenericPassword.clearAll(in: accessGroup))
-		XCTAssertNil(try Keychain.GenericPassword.fetchOnlyMatchingFromKeychain(query: query, retrieveValue: true))
+		XCTAssertNil(try query.fetchOnlyMatchingFromKeychain(retrieveValue: true))
 	}
 	
 	func testUpsertWithLease() throws {
