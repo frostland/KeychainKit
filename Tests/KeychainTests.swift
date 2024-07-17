@@ -87,4 +87,20 @@ final class KeychainTests : XCTestCase {
 		XCTAssertNil(try Keychain.GenericPassword.fetchOnlyMatchingFromKeychain(query: query, retrieveValue: true))
 	}
 	
+	func testUpsertWithLease() throws {
+		let data = Data("hello!".utf8)
+		let accessGroup = "DVL8GW97S8.fr.frostland.KeychainTestsHost.shared"
+		let keychainID = "fr.frostland.Keychain.testClearKeychainAccessGroup"
+		let baseQuery = Keychain.GenericPassword(service: keychainID, accessGroup: accessGroup)
+		XCTAssertNoThrow(try baseQuery.withGeneric(Data()).upsertInKeychainWithLease(updatedAttributes: .init(generic: Data([1]), value: data)))
+		XCTAssertThrowsError(
+			try baseQuery.withGeneric(Data()).upsertInKeychainWithLease(updatedAttributes: .init(generic: Data([2]), value: data)),
+			"the upsert should fail as the local data is out-of-date",
+			{ err in
+				XCTAssertEqual(err as? KeychainError, .localItemOutOfDate)
+			}
+		)
+		XCTAssertNoThrow(try baseQuery.withGeneric(Data([1])).upsertInKeychainWithLease(updatedAttributes: .init(generic: Data([2]), value: data)))
+	}
+	
 }

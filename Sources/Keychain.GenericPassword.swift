@@ -150,6 +150,7 @@ public extension Keychain.GenericPassword {
 	  or say we don’t care as the issue is very niche. */
 	func upsertInKeychainWithLease(updatedAttributes: Keychain.GenericPassword) throws {
 		assert(generic != nil && updatedAttributes.generic != nil)
+		assert(generic != updatedAttributes.generic)
 		do {
 			try Keychain.performUpdate(of: attributes, updatedAttributes: updatedAttributes.attributesNoClass)
 		} catch let err as KeychainError where err.isItemNotFoundError {
@@ -262,6 +263,11 @@ public extension Keychain.GenericPassword {
 	var generic: Data? {
 		get {typedAttribute(for: kSecAttrGeneric)}
 		set {attributes[kSecAttrGeneric] = newValue as CFData?}
+	}
+	func withGeneric(_ newGeneric: Data?) -> Self {
+		var ret = self
+		ret.generic = newGeneric
+		return ret
 	}
 	
 	/**
