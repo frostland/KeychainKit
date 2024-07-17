@@ -203,10 +203,12 @@ public extension Keychain.GenericPassword {
 		set {attributes[kSecValueData] = newValue as CFData?}
 	}
 	
+#if os(macOS)
 	var ref: SecKeychainItem? {
 		get {typedAttribute(for: kSecValueRef)}
 		set {attributes[kSecValueRef] = newValue}
 	}
+#endif
 	
 	var persistentRef: Data? {
 		get {typedAttribute(for: kSecValuePersistentRef)}
