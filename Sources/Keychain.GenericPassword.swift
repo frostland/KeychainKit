@@ -45,13 +45,13 @@ public extension Keychain.GenericPassword {
 		try Keychain.clearAll(ofClass: Self.securityClass, in: accessGroup)
 	}
 	
-	func fetchAllMatchingFromKeychain(retrieveData: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> [Keychain.GenericPassword] {
+	func fetchAllMatchingFromKeychain(retrieveProtectedData: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> [Keychain.GenericPassword] {
 		var query = attributes
 		query[kSecMatchLimit]          = kSecMatchLimitAll
 		query[kSecClass]               = kSecClassGenericPassword
 		query[kSecReturnAttributes]    = kCFBooleanTrue
 		query[kSecReturnRef]           = (retrieveRef           ? kCFBooleanTrue : kCFBooleanFalse)
-		query[kSecReturnData]          = (retrieveData          ? kCFBooleanTrue : kCFBooleanFalse)
+		query[kSecReturnData]          = (retrieveProtectedData ? kCFBooleanTrue : kCFBooleanFalse)
 		query[kSecReturnPersistentRef] = (retrievePersistentRef ? kCFBooleanTrue : kCFBooleanFalse)
 		guard let results: [[CFString: Any]] = try Keychain.performSearch(query) else {
 			return []
@@ -62,13 +62,13 @@ public extension Keychain.GenericPassword {
 	/**
 	 If more than one is matching, the ``KeychainError.multipleMatches`` error is thrown.
 	 If nothing matches `nil` is returned. */
-	func fetchOnlyMatchingFromKeychain(retrieveValue: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> Keychain.GenericPassword? {
+	func fetchOnlyMatchingFromKeychain(retrieveProtectedData: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> Keychain.GenericPassword? {
 		var query = attributes
 		query[kSecMatchLimit]          = 2
 		query[kSecClass]               = kSecClassGenericPassword
 		query[kSecReturnAttributes]    = kCFBooleanTrue
 		query[kSecReturnRef]           = (retrieveRef           ? kCFBooleanTrue : kCFBooleanFalse)
-		query[kSecReturnData]          = (retrieveValue         ? kCFBooleanTrue : kCFBooleanFalse)
+		query[kSecReturnData]          = (retrieveProtectedData ? kCFBooleanTrue : kCFBooleanFalse)
 		query[kSecReturnPersistentRef] = (retrievePersistentRef ? kCFBooleanTrue : kCFBooleanFalse)
 		guard let results: [[CFString: Any]] = try Keychain.performSearch(query), let result = results.first else {
 			return nil
@@ -79,13 +79,13 @@ public extension Keychain.GenericPassword {
 		return .init(attributesNoClass: result)
 	}
 	
-	func fetchAnyMatchingFromKeychain(retrieveValue: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> Keychain.GenericPassword? {
+	func fetchAnyMatchingFromKeychain(retrieveProtectedData: Bool, retrieveRef: Bool = false, retrievePersistentRef: Bool = false) throws -> Keychain.GenericPassword? {
 		var query = attributes
 		query[kSecMatchLimit]          = kSecMatchLimitOne
 		query[kSecClass]               = kSecClassGenericPassword
 		query[kSecReturnAttributes]    = kCFBooleanTrue
 		query[kSecReturnRef]           = (retrieveRef           ? kCFBooleanTrue : kCFBooleanFalse)
-		query[kSecReturnData]          = (retrieveValue         ? kCFBooleanTrue : kCFBooleanFalse)
+		query[kSecReturnData]          = (retrieveProtectedData ? kCFBooleanTrue : kCFBooleanFalse)
 		query[kSecReturnPersistentRef] = (retrievePersistentRef ? kCFBooleanTrue : kCFBooleanFalse)
 		guard let result: [CFString: Any] = try Keychain.performSearch(query) else {
 			return nil
@@ -93,7 +93,7 @@ public extension Keychain.GenericPassword {
 		return .init(attributesNoClass: result)
 	}
 	
-	init(service: String? = nil, account: String? = nil, accessGroup: String? = nil, synchronizable: Bool? = nil, generic: Data? = nil, value: Data? = nil) {
+	init(service: String? = nil, account: String? = nil, accessGroup: String? = nil, synchronizable: Bool? = nil, generic: Data? = nil, protectedData: Data? = nil) {
 		self.init(attributes: [
 			kSecClass: kSecClassGenericPassword
 		])
@@ -102,7 +102,7 @@ public extension Keychain.GenericPassword {
 		if let accessGroup    {self.accessGroup    = accessGroup}
 		if let synchronizable {self.synchronizable = synchronizable}
 		if let generic        {self.generic        = generic}
-		if let value          {self.value          = value}
+		if let protectedData  {self.protectedData  = protectedData}
 	}
 	
 	init(primaryKeyOf otherPassword: Keychain.GenericPassword) {
@@ -171,7 +171,7 @@ public extension Keychain.GenericPassword {
 			/* Let’s see if we can find the item without the generic. */
 			var query = self
 			query.attributes[kSecAttrGeneric] = nil
-			guard try query.fetchOnlyMatchingFromKeychain(retrieveValue: false) == nil else {
+			guard try query.fetchOnlyMatchingFromKeychain(retrieveProtectedData: false) == nil else {
 				throw Err.localItemOutOfDate
 			}
 			/* The item was not found, we can create it. */
@@ -212,7 +212,7 @@ public extension Keychain.GenericPassword {
 	 * - kSecAttrAccessGroup
 	 * - kSecAttrSynchronizable */
 	
-	var value: Data? {
+	var protectedData: Data? {
 		get {typedAttribute(for: kSecValueData)}
 		set {attributes[kSecValueData] = newValue as CFData?}
 	}
