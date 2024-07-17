@@ -194,6 +194,53 @@ final class SecurityTests : XCTestCase {
 		XCTAssert(CFGetTypeID(ret) == CFDictionaryGetTypeID())
 	}
 	
+	func testInsertAndSearchForEmptyGeneric() throws {
+		let baseQuery: [CFString: Any] = [
+			kSecClass: kSecClassGenericPassword,
+			kSecUseDataProtectionKeychain: kCFBooleanTrue!,
+			
+			kSecAttrService: "SecTest",
+			kSecAttrAccount: "Bob"
+		]
+		
+		/* Create the entry w/ some data (42) and no generic. */
+		XCTAssertNoThrow(try secCall{
+			var query = baseQuery
+			query[kSecValueData] = Data([42])
+			return SecItemAdd(query as CFDictionary, nil)
+		})
+		
+		XCTAssertNoThrow(try secCall{
+			return SecItemUpdate(baseQuery as CFDictionary, [:] as CFDictionary)
+		})
+		
+		XCTAssertThrowsError(try secCall{
+			var query = baseQuery
+			query[kSecAttrGeneric] = Data([])
+			return SecItemUpdate(query as CFDictionary, [:] as CFDictionary)
+		}, "item does not have correct generic; the call should fail", { (err: Error) in
+			XCTAssertEqual(err as? KeychainError, KeychainError(statusCode: errSecItemNotFound))
+		})
+		
+		XCTAssertNoThrow(try secCall{
+			return SecItemUpdate(baseQuery as CFDictionary, [kSecAttrGeneric: Data([])] as CFDictionary)
+		})
+		
+		XCTAssertThrowsError(try secCall{
+			var query = baseQuery
+			query[kSecAttrGeneric] = Data([1])
+			return SecItemUpdate(query as CFDictionary, [:] as CFDictionary)
+		}, "item does not have correct generic; the call should fail", { (err: Error) in
+			XCTAssertEqual(err as? KeychainError, KeychainError(statusCode: errSecItemNotFound))
+		})
+		
+		XCTAssertNoThrow(try secCall{
+			var query = baseQuery
+			query[kSecAttrGeneric] = Data([])
+			return SecItemUpdate(query as CFDictionary, [:] as CFDictionary)
+		})
+	}
+	
 	func testFetchItemDataAndPersistentRef() throws {
 		let baseQuery: [CFString: Any] = [
 			kSecClass: kSecClassGenericPassword,
@@ -278,6 +325,7 @@ extension KeychainError : Equatable {
 			case (.invalidResponseFromSecurityFramework,      .invalidResponseFromSecurityFramework):      return true
 			case (.multipleMatches,                           .multipleMatches):                           return true
 			case (.unexpectedResultType,                      .unexpectedResultType):                      return true
+			case (.localItemOutOfDate,                        .localItemOutOfDate):                        return true
 				
 			case (.accessGroupNotSupported,                   _): return false
 			case (.clearingKeychainOnNonSandboxedEnvironment, _): return false
@@ -285,6 +333,7 @@ extension KeychainError : Equatable {
 			case (.invalidResponseFromSecurityFramework,      _): return false
 			case (.multipleMatches,                           _): return false
 			case (.unexpectedResultType,                      _): return false
+			case (.localItemOutOfDate,                        _): return false
 		}
 	}
 	
