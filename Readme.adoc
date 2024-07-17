@@ -1,4 +1,4 @@
-= Keychain
+= KeychainKit
 François Lamboley <fload@me.com>
 
 Yet another Keychain wrapper.
@@ -7,15 +7,19 @@ Yet another Keychain wrapper.
 [source,swift]
 ----
 let data = Data("Hello world!".utf8)
-let keychainId = "fr.frostland.Keychain.test"
+let keychainID = "fr.frostland.Keychain.testBasicStorage"
 
-/* Set some data in the keychain */
-try Keychain.setStoredData(data, withIdentifier: keychainId)
+/* Set some data in the keychain. */
+try Keychain.GenericPassword(service: keychainID)
+   .upsertInKeychain(updatedAttributes: .init(value: data))
 
-/* Retrieve the data from the keychain */
-let storedData = try Keychain.getStoredData(withIdentifier: keychainId)
+/* Retrieve the data from the keychain. */
+let storedData = try Keychain.GenericPassword
+   .fetchOnlyMatchingFromKeychain(query: query, retrieveValue: true)?
+   .value
 assert(data == storedData) /* This should be true */
 
-/* Delete some data from the keychain */
-try Keychain.removeStoredData(withIdentifier: keychainId)
+/* Delete some data from the keychain. */
+try Keychain.GenericPassword(service: keychainID)
+   .deleteFromKeychain()
 ----
