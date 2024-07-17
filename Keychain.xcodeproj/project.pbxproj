@@ -46,6 +46,8 @@
 		7B00C8C02C448A6100254584 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		7B00C8C22C44969300254584 /* Keychain+PerformQueries.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Keychain+PerformQueries.swift"; sourceTree = "<group>"; };
 		7B00C8C42C44970200254584 /* Keychain+Conveniences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Keychain+Conveniences.swift"; sourceTree = "<group>"; };
+		7B030C4A2C488967007A6D2E /* License.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = License.txt; sourceTree = "<group>"; };
+		7B030C4B2C488967007A6D2E /* Readme.adoc */ = {isa = PBXFileReference; lastKnownFileType = text; path = Readme.adoc; sourceTree = "<group>"; };
 		7B235F1C2C3B4B6000C13B8B /* KeychainKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KeychainKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B235F242C3B4B6000C13B8B /* KeychainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeychainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B235F292C3B4B6000C13B8B /* KeychainTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTests.swift; sourceTree = "<group>"; };
@@ -92,6 +94,8 @@
 		7B235F122C3B4B6000C13B8B = {
 			isa = PBXGroup;
 			children = (
+				7B030C4B2C488967007A6D2E /* Readme.adoc */,
+				7B030C4A2C488967007A6D2E /* License.txt */,
 				7B235F1E2C3B4B6000C13B8B /* KeychainKit */,
 				7B235F282C3B4B6000C13B8B /* KeychainKitTests */,
 				7BFA99A42C3B4EE0003AA8EE /* KeychainTestsHost */,
