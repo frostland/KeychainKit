@@ -1,7 +1,7 @@
 = KeychainKit
 François Lamboley <fload@me.com>
 
-Yet another Keychain wrapper.
+Yet another Security framework wrapper.
 
 == Usage
 [source,swift]
