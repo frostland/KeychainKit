@@ -14,9 +14,9 @@ try Keychain.GenericPassword(service: keychainID)
    .upsertInKeychain(updatedAttributes: .init(value: data))
 
 /* Retrieve the data from the keychain. */
-let storedData = try Keychain.GenericPassword
-   .fetchOnlyMatchingFromKeychain(query: query, retrieveValue: true)?
-   .value
+let storedData = try Keychain.GenericPassword(service: keychainID)
+   .fetchAnyMatchingFromKeychain(retrieveProtectedData: true)?
+   .protectedData
 assert(data == storedData) /* This should be true */
 
 /* Delete some data from the keychain. */
