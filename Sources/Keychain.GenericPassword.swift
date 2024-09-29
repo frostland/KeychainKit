@@ -125,7 +125,7 @@ public extension Keychain.GenericPassword {
 			 *  in which case we’ll get a duplicated item error anyways, so it’s not a big deal.
 			 *
 			 * We try updating first.
-			 * We could probably have tried the insertion first instead, but we had to chose something… */
+			 * We could probably have tried the insertion first instead, but we had to choose something… */
 			try Keychain.performUpdate(of: attributes, updatedAttributes: updatedAttributes.attributesNoClass)
 		} catch let err as KeychainError where err.isItemNotFoundError {
 			try insertInKeychain(withUpdatedAttributes: updatedAttributes)
