@@ -315,7 +315,7 @@ final class SecurityTests : XCTestCase {
 }
 
 
-extension KeychainError : Equatable {
+extension KeychainError : @retroactive Equatable {
 	
 	public static func ==(lhs: KeychainError, rhs: KeychainError) -> Bool {
 		switch (lhs, rhs) {
